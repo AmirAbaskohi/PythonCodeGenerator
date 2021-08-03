@@ -22,9 +22,13 @@ for i in range(3):
     end_time -= SECONDS_IN_A_DAY
 
     result = github.search_repositories(query)
-    print(result.totalCount)
-
+	
+    i = 1
     for repository in result:
+        print(f"{i}/{result.totalCount}")
+        i += 1
+        if (repository.size > 5000):
+            continue
         print(repository.clone_url)
         os.system(f"git clone {repository.clone_url} repos/{repository.owner.login}/{repository.name}")
     
