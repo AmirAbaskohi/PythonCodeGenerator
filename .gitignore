@@ -4,3 +4,7 @@ token.txt
 # data
 repos/
 data.txt
+
+#model
+GPyT/
+wandb/

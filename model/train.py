@@ -6,11 +6,13 @@ from transformers.data import data_collator
 from transformers import Trainer, TrainingArguments
 import os
 
+os.environ["WANDB_DISABLED"] = "true"
+
 def encode(lines):
     return tokenizer(lines['text'], add_special_tokens=True, truncation=True, max_length=512)
 
 TRAIN_BASE = False
-TOKENIZER_DIR = "tokenizer"
+TOKENIZER_DIR = "../tokenizer"
 
 paths = ["../data.txt"]
 
@@ -44,11 +46,11 @@ print(tokenizer.decode(t))
 
 config = GPT2Config(
     vocab_size = tokenizer.vocab_size,
-    bos_token_id = tokenizer.bos_token_id,
-    eos_token_id = tokenizer.eos_token_id
+    bos_token = tokenizer.bos_token_id,
+    eos_token = tokenizer.eos_token_id
 )
 
-model = GPT2LMHeadModel()
+model = GPT2LMHeadModel(config)
 
 dataset = load_dataset("text", data_files=paths)
 
@@ -62,12 +64,13 @@ if not os.path.exists("../GPyT"):
 
 training_args = TrainingArguments(
     output_dir="../GPyT",
-    per_device_train_batch_size=10,
     overwrite_output_dir=True,
     num_train_epochs=1,
+    per_device_train_batch_size=10,
     save_steps=100,
     save_total_limit=2,
-    prediction_loss_only=True
+    prediction_loss_only=True,
+    remove_unused_columns=False
 )
 
 trainer = Trainer(

@@ -3,7 +3,7 @@ from tokenizers import ByteLevelBPETokenizer
 from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer
 
 TRAIN_BASE = False
-TOKENIZER_DIR = "tokenizer"
+TOKENIZER_DIR = "../tokenizer"
 
 paths = ["../data.txt"]
 
