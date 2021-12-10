@@ -1,6 +1,10 @@
+from numpy import mod
 from tokenizers import ByteLevelBPETokenizer
-from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer
+from transformers import GPT2Config, GPT2LMHeadModel, GPT2Tokenizer, DataCollatorForLanguageModeling, training_args
 from datasets import load_dataset
+from transformers.data import data_collator
+from transformers import Trainer, TrainingArguments
+import os
 
 def encode(lines):
     return tokenizer(lines['text'], add_special_tokens=True, truncation=True, max_length=512)
@@ -50,3 +54,28 @@ dataset = load_dataset("text", data_files=paths)
 
 dataset.set_transform(encode)
 dataset = dataset['train']
+
+data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=0.15)
+
+if not os.path.exists("../GPyT"):
+    os.makedirs("../GPyT")
+
+training_args = TrainingArguments(
+    output_dir="../GPyT",
+    per_device_train_batch_size=10,
+    overwrite_output_dir=True,
+    num_train_epochs=1,
+    save_steps=100,
+    save_total_limit=2,
+    prediction_loss_only=True
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    data_collator=data_collator,
+    train_dataset=dataset
+)
+
+trainer.train()
+trainer.save_model("GPyT")
